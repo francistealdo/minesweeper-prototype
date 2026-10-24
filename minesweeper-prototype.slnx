@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="MinesweeperPrototype.Application/MinesweeperPrototype.Application.csproj" Id="fc178f80-a99e-48f5-82ad-e6fc4537aff1" />
+  <Project Path="MinesweeperPrototype.Core/MinesweeperPrototype.Core.csproj" />
+  <Project Path="MinesweeperPrototype.Wpf/MinesweeperPrototype.Wpf.csproj" Id="cffeaa14-7921-492c-8214-ae9a8a204e85" />
+</Solution>
