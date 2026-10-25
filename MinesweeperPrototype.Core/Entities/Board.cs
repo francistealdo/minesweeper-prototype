@@ -9,12 +9,6 @@
 
         public Board(int rows, int columns, int mineCount)
         {
-            Rows = rows;
-            Columns = columns;
-            MineCount = mineCount;
-
-            Cells = new Cell[rows, columns];
-
             if (rows <= 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(rows));
@@ -30,6 +24,12 @@
                 throw new ArgumentOutOfRangeException(nameof(mineCount));
             }
 
+            Rows = rows;
+            Columns = columns;
+            MineCount = mineCount;
+
+            Cells = new Cell[rows, columns];
+
             InitializeCells();
         }
 
@@ -39,7 +39,11 @@
             {
                 for (var column = 0; column < Columns; column++)
                 {
-                    Cells[row, column] = new Cell();
+                    Cells[row, column] = new Cell
+                    {
+                        Row = row,
+                        Column = column
+                    };
                 }
             }
         }

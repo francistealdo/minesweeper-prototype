@@ -1,4 +1,5 @@
 ﻿using MinesweeperPrototype.Core.Entities;
+using MinesweeperPrototype.Core.Enums;
 using MinesweeperPrototype.Core.Services;
 
 namespace MinesweeperPrototype.Application.Services;
@@ -7,8 +8,9 @@ public sealed class GameService
 {
     private readonly MinePlacementService _minePlacementService = new();
     private readonly AdjacentMineCalculator _adjacentMineCalculator = new();
-
     private Board? _board;
+    public Board? Board => _board;
+    public GameStatus Status { get; private set; }
 
     public void StartNewGame(int rows, int columns, int mines)
     {
@@ -16,6 +18,8 @@ public sealed class GameService
 
         _minePlacementService.PlaceMines(_board);
         _adjacentMineCalculator.Calculate(_board);
+
+        Status = GameStatus.InProgress;
     }
 
     public void Reveal(int row, int column)
@@ -25,13 +29,22 @@ public sealed class GameService
             throw new InvalidOperationException("No game has been started.");
         }
 
-        if (row < 0 || row >= _board.Rows ||
-            column < 0 || column >= _board.Columns)
+        if (row < 0 || row >= _board.Rows || column < 0 || column >= _board.Columns)
         {
             return;
         }
 
         RevealCell(_board, row, column);
+
+        if (Status == GameStatus.Lost)
+        {
+            return;
+        }
+
+        if (HasWon(_board))
+        {
+            Status = GameStatus.Won;
+        }
     }
 
     public void ToggleFlag(int row, int column)
@@ -39,6 +52,11 @@ public sealed class GameService
         if (_board is null)
         {
             throw new InvalidOperationException("No game has been started.");
+        }
+
+        if (row < 0 || row >= _board.Rows || column < 0 || column >= _board.Columns)
+        {
+            return;
         }
 
         var cell = _board.Cells[row, column];
@@ -51,7 +69,7 @@ public sealed class GameService
         cell.IsFlagged = !cell.IsFlagged;
     }
 
-    private static void RevealCell(Board board, int row, int column)
+    private void RevealCell(Board board, int row, int column)
     {
         if (row < 0 || row >= board.Rows ||
             column < 0 || column >= board.Columns)
@@ -70,6 +88,7 @@ public sealed class GameService
 
         if (cell.HasMine)
         {
+            Status = GameStatus.Lost;
             return;
         }
 
@@ -93,5 +112,23 @@ public sealed class GameService
                     column + columnOffset);
             }
         }
+    }
+
+    private static bool HasWon(Board board)
+    {
+        for (var row = 0; row < board.Rows; row++)
+        {
+            for (var column = 0; column < board.Columns; column++)
+            {
+                var cell = board.Cells[row, column];
+
+                if (!cell.HasMine && !cell.IsRevealed)
+                {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 }
