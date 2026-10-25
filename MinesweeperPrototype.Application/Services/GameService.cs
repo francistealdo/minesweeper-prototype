@@ -24,6 +24,11 @@ public sealed class GameService
 
     public void Reveal(int row, int column)
     {
+        if (Status is GameStatus.Won or GameStatus.Lost)
+        {
+            return;
+        }
+
         if (_board is null)
         {
             throw new InvalidOperationException("No game has been started.");
@@ -54,7 +59,13 @@ public sealed class GameService
             throw new InvalidOperationException("No game has been started.");
         }
 
-        if (row < 0 || row >= _board.Rows || column < 0 || column >= _board.Columns)
+        if (Status is GameStatus.Won or GameStatus.Lost)
+        {
+            return;
+        }
+
+        if (row < 0 || row >= _board.Rows ||
+            column < 0 || column >= _board.Columns)
         {
             return;
         }
@@ -67,12 +78,35 @@ public sealed class GameService
         }
 
         cell.IsFlagged = !cell.IsFlagged;
+
+        if (HasWon(_board))
+        {
+            Status = GameStatus.Won;
+        }
     }
+
+    public void Timeout()
+    {
+        if (_board is null)
+        {
+            return;
+        }
+
+        if (Status is GameStatus.Won or GameStatus.Lost)
+        {
+            return;
+        }
+
+        Status = GameStatus.Lost;
+
+        RevealAllMines(_board);
+    }
+
+    #region Private Methods
 
     private void RevealCell(Board board, int row, int column)
     {
-        if (row < 0 || row >= board.Rows ||
-            column < 0 || column >= board.Columns)
+        if (row < 0 || row >= board.Rows || column < 0 || column >= board.Columns)
         {
             return;
         }
@@ -89,6 +123,7 @@ public sealed class GameService
         if (cell.HasMine)
         {
             Status = GameStatus.Lost;
+            RevealAllMines(board);
             return;
         }
 
@@ -106,10 +141,7 @@ public sealed class GameService
                     continue;
                 }
 
-                RevealCell(
-                    board,
-                    row + rowOffset,
-                    column + columnOffset);
+                RevealCell(board, row + rowOffset, column + columnOffset);
             }
         }
     }
@@ -122,7 +154,17 @@ public sealed class GameService
             {
                 var cell = board.Cells[row, column];
 
+                if (cell.HasMine && !cell.IsFlagged)
+                {
+                    return false;
+                }
+
                 if (!cell.HasMine && !cell.IsRevealed)
+                {
+                    return false;
+                }
+
+                if (!cell.HasMine && cell.IsFlagged)
                 {
                     return false;
                 }
@@ -131,4 +173,22 @@ public sealed class GameService
 
         return true;
     }
+
+    private static void RevealAllMines(Board board)
+    {
+        for (var row = 0; row < board.Rows; row++)
+        {
+            for (var column = 0; column < board.Columns; column++)
+            {
+                var cell = board.Cells[row, column];
+
+                if (cell.HasMine)
+                {
+                    cell.IsRevealed = true;
+                }
+            }
+        }
+    }
+
+    #endregion
 }

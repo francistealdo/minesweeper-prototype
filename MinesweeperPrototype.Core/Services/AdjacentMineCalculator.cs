@@ -17,18 +17,12 @@ public sealed class AdjacentMineCalculator
                     continue;
                 }
 
-                cell.AdjacentMines = CountAdjacentMines(
-                    board,
-                    row,
-                    column);
+                cell.AdjacentMines = CountAdjacentMines(board, row, column);
             }
         }
     }
 
-    private static int CountAdjacentMines(
-        Board board,
-        int row,
-        int column)
+    private static int CountAdjacentMines(Board board, int row, int column)
     {
         var count = 0;
 

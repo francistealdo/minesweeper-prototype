@@ -2,26 +2,129 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Minesweeper"
-        Height="450"
-        Width="450">
+        Height="520"
+        Width="450"
+        ResizeMode="NoResize">
 
     <Grid Margin="20">
 
-        <ItemsControl ItemsSource="{Binding Cells}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- PAINEL SUPERIOR -->
+        <Grid Grid.Row="0" Margin="0,0,0,12">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- TIMER -->
+            <Border Grid.Column="0"
+                Background="#101810"
+                BorderBrush="#2E4F2E"
+                BorderThickness="2"
+                Padding="10,5"
+                HorizontalAlignment="Left">
+
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="TIME "
+                           Foreground="#4CFF4C"
+                           FontFamily="Consolas"
+                           FontWeight="Bold"
+                           FontSize="16" />
+
+                    <TextBlock Text="{Binding TimerDisplay}"
+                           Foreground="#4CFF4C"
+                           FontFamily="Consolas"
+                           FontWeight="Bold"
+                           FontSize="22" />
+                </StackPanel>
+            </Border>
+
+            <!-- RESET -->
+            <Button Grid.Column="1"
+                Command="{Binding NewGameCommand}"
+                Content="{Binding FaceIcon}"
+                FontSize="22"
+                Width="48"
+                Height="42"
+                Margin="10,0" />
+
+            <!-- BOMBS LEFT -->
+            <Border Grid.Column="2"
+                Background="#180C0C"
+                BorderBrush="#5B2020"
+                BorderThickness="2"
+                Padding="10,5"
+                HorizontalAlignment="Right">
+
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="BOMBS "
+                           Foreground="#FF4040"
+                           FontFamily="Consolas"
+                           FontWeight="Bold"
+                           FontSize="16" />
+
+                    <TextBlock Text="{Binding BombsLeftDisplay}"
+                           Foreground="#FF4040"
+                           FontFamily="Consolas"
+                           FontWeight="Bold"
+                           FontSize="22" />
+                </StackPanel>
+            </Border>
+
+        </Grid>
+
+        <!-- TABULEIRO -->
+        <ItemsControl Grid.Row="1" ItemsSource="{Binding Cells}">
+
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <UniformGrid Rows="9"
-                                 Columns="9" />
+                             Columns="9" />
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
 
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
+
                     <Button Width="40"
-                            Height="40"
-                            Content="{Binding AdjacentMines}" />
+                        Height="40"
+                        Command="{Binding RevealCommand}"
+                        Content="{Binding DisplayContent}">
+
+                        <Button.InputBindings>
+                            <MouseBinding MouseAction="RightClick"
+                                      Command="{Binding ToggleFlagCommand}" />
+                        </Button.InputBindings>
+
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Background"
+                                    Value="LightGray" />
+
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsRevealed}"
+                                             Value="True">
+                                        <Setter Property="Background"
+                                            Value="White" />
+
+                                        <Setter Property="BorderThickness"
+                                            Value="1" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+
+                    </Button>
+
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
+
         </ItemsControl>
 
     </Grid>
