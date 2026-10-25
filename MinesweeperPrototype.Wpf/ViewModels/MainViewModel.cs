@@ -10,12 +10,6 @@ namespace MinesweeperPrototype.Wpf.ViewModels;
 public partial class MainViewModel : ObservableObject
 {
     [ObservableProperty]
-    private string gameStatusText = string.Empty;
-
-    [ObservableProperty]
-    private int elapsedSeconds;
-
-    [ObservableProperty]
     private int bombsLeft;
 
     [ObservableProperty]
@@ -95,7 +89,8 @@ public partial class MainViewModel : ObservableObject
                     Column = column,
                     IsRevealed = cell.IsRevealed,
                     IsFlagged = cell.IsFlagged,
-                    AdjacentMines = cell.AdjacentMines
+                    AdjacentMines = cell.AdjacentMines,
+                    HasMine = cell.HasMine
                 });
             }
         }
@@ -130,13 +125,6 @@ public partial class MainViewModel : ObservableObject
             cellViewModel.AdjacentMines = cell.AdjacentMines;
             cellViewModel.HasMine = cell.HasMine;
         }
-
-        GameStatusText = _gameService.Status switch
-        {
-            GameStatus.Won => "You won!",
-            GameStatus.Lost => "Game over!",
-            _ => string.Empty
-        };
 
         BombsLeft = board.MineCount - Cells.Count(c => c.IsFlagged);
 
@@ -178,11 +166,6 @@ public partial class MainViewModel : ObservableObject
     #endregion
 
     #region PropertyChanged Callbacks
-
-    partial void OnElapsedSecondsChanged(int value)
-    {
-        OnPropertyChanged(nameof(TimerDisplay));
-    }
 
     partial void OnBombsLeftChanged(int value)
     {
