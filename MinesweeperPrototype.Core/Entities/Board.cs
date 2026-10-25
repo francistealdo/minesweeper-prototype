@@ -14,6 +14,34 @@
             MineCount = mineCount;
 
             Cells = new Cell[rows, columns];
+
+            if (rows <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(rows));
+            }
+
+            if (columns <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(columns));
+            }
+
+            if (mineCount < 0 || mineCount >= rows * columns)
+            {
+                throw new ArgumentOutOfRangeException(nameof(mineCount));
+            }
+
+            InitializeCells();
+        }
+
+        private void InitializeCells()
+        {
+            for (var row = 0; row < Rows; row++)
+            {
+                for (var column = 0; column < Columns; column++)
+                {
+                    Cells[row, column] = new Cell();
+                }
+            }
         }
     }
 }
